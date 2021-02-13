@@ -1,8 +1,8 @@
 {
-  "name": "domain-setup-aws",
+  "name": "setup-domain-aws",
   "repository": {
     "type": "git",
-    "url": "git@github.com:farkmarnum/domain-setup-aws.git"
+    "url": "git@github.com:farkmarnum/setup-domain-aws.git"
   },
   "files": [
     "lib/**/*"

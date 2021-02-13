@@ -1,4 +1,4 @@
-# domain-setup-aws
+# setup-domain-aws
 
 ## wat
 
