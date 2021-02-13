@@ -10,11 +10,11 @@
   "description": "Automate AWS to buy a domain, set up Route53, & set up ACM cert.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
-  "version": "1.0.1",
+  "version": "0.1.0",
   "scripts": {
     "test": "jest --config jestconfig.json --passWithNoTests",
     "build": "tsc",
-    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+    "format": "prettier --write \"src/**/*.(js|ts)\"",
     "lint": "tslint -p tsconfig.json",
     "prepare": "npm run build",
     "prepublishOnly": "npm test && npm run lint",
