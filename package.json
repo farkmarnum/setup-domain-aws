@@ -1,5 +1,5 @@
 {
-  "name": "provision-domain",
+  "name": "domain-setup-aws",
   "repository": {
     "type": "git",
     "url": "git@github.com:farkmarnum/domain-setup-aws.git"
