@@ -1,9 +1,7 @@
-
 node_modules
-
 coverage
-
 build
+lib
 
 .DS_Store
 
