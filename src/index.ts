@@ -66,11 +66,12 @@ program
   .action((options) => init(options, registerDomain))
 
 program
-  .command('gethostedzone')
+  .command('get-hosted-zone')
   .description('Get Hosted Zone Id')
   .option('-v, --verbose', 'Verbose mode')
   .option('-vv, --extra-verbose', 'Debug mode')
   .option('--region <region>', 'AWS region')
+  .option('--domain <domain>', 'Domain')
   .option(
     '--profile <profile name>',
     "AWS profile to use (if unspecified, uses 'default')",
@@ -83,6 +84,7 @@ program
   .option('-v, --verbose', 'Verbose mode')
   .option('-vv, --extra-verbose', 'Debug mode')
   .option('--region <region>', 'AWS region')
+  .option('--domain <domain>', 'Domain')
   .option(
     '--profile <profile name>',
     "AWS profile to use (if unspecified, uses 'default')",
