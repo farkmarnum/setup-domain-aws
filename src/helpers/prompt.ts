@@ -1,5 +1,14 @@
 import prompts from 'prompts'
 import log from './logger'
+import fs from 'fs'
+import tty from 'tty'
+
+let stdin: NodeJS.ReadStream & { fd?: 0 } = process.stdin
+
+if (!tty.isatty(0)) {
+  const ttyFd = fs.openSync('/dev/tty', 'r')
+  stdin = new tty.ReadStream(ttyFd)
+}
 
 export const prompt = async ({
   message,
@@ -14,6 +23,7 @@ export const prompt = async ({
       message,
       validate,
       initial,
+      stdin,
     },
     {
       onCancel: () => {

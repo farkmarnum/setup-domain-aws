@@ -1,3 +1,4 @@
+import fs from 'fs'
 import log from './helpers/logger'
 import { prompt, validateDomainOrSubdomain } from './helpers/prompt'
 import { upload } from './helpers/secrets'
@@ -28,15 +29,20 @@ const uploadConfig = async (options: Options) => {
     })) as string
   }
 
-  const auth = await prompt({
-    message: 'GitHub personal access token',
-  })
+  let auth
+  if (options.getPatFromStdin) {
+    auth = global.pipedInput?.trim()
+  } else {
+    auth = await prompt({
+      message: 'GitHub personal access token',
+    })
+  }
 
   await upload({ auth, repo, name: 'DOMAIN', value: domain })
   await upload({ auth, repo, name: 'HOSTED_ZONE_ID', value: hostedZoneId })
   await upload({ auth, repo, name: 'CERTIFICATE_ARN', value: certificateArn })
 
-  log.info('Setting GitHub Secrets complete!')
+  log.log('Setting GitHub Secrets complete!')
 }
 
 export default uploadConfig

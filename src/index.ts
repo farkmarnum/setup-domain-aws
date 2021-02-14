@@ -7,6 +7,7 @@ import requestCert from './cert'
 import uploadConfig from './config'
 import registerDomain from './domain'
 import getHostedZoneId from './hosted-zone'
+import { loadPipedData } from './helpers/stdin'
 
 const VERSION = '0.1.3'
 
@@ -20,16 +21,29 @@ export const init = async (
   const { profile } = options
   setCredentials(profile)
 
-  return await callback(options)
+  await loadPipedData()
+
+  if (options.getPatFromStdin && !global.pipedInput) {
+    log.error('Did not receive stdin!')
+    process.exit(1)
+  }
+  await callback(options)
+  process.exit(0)
 }
 
 const program = new Command()
 
 const full = async (options: Options) => {
-  const { domain } = await registerDomain(options)
-  const { hostedZoneId } = await getHostedZoneId({ ...options, domain })
-  const { certificateArn } = await requestCert({ ...options, domain })
-  await uploadConfig({ ...options, domain, hostedZoneId, certificateArn })
+  const { domain, region } = await registerDomain(options)
+  const { hostedZoneId } = await getHostedZoneId({ ...options, domain, region })
+  const { certificateArn } = await requestCert({ ...options, domain, region })
+  await uploadConfig({
+    ...options,
+    domain,
+    hostedZoneId,
+    certificateArn,
+    region,
+  })
 }
 
 program
@@ -53,6 +67,7 @@ program
   .option('--domain <domain>', 'Domain')
   .option('--region <region>', 'AWS region')
   .option('--repo <repo>', 'GitHub repository')
+  .option('--get-pat-from-stdin', 'Get GitHub Personal Access Token from stdin')
   .action((options) => init(options, full))
 
 program
@@ -101,6 +116,7 @@ program
   .option('-v, --verbose', 'Verbose mode')
   .option('-vv, --extra-verbose', 'Debug mode')
   .option('--repo <repo>', 'GitHub repository')
+  .option('--get-pat-from-stdin', 'Get GitHub Personal Access Token from stdin')
   .action((options) => init(options, uploadConfig))
 
 program.parse()

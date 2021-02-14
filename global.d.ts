@@ -1,3 +1,9 @@
+declare module NodeJS {
+  interface Global {
+    pipedInput: string | undefined
+  }
+}
+
 type Options = {
   verbose?: boolean
   extraVerbose?: boolean
@@ -7,10 +13,12 @@ type Options = {
   profile?: string
   region?: string
   repo?: string
+  getPatFromStdin?: boolean
 }
 
 interface DomainResult {
   domain: string
+  region: string
 }
 
 interface CertResult {

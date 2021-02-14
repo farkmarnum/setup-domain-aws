@@ -11,10 +11,10 @@ const registerDomain = async (options: Options): Promise<DomainResult> => {
   let { region, domain } = options
 
   if (!region) {
-    region = await prompt({
+    region = (await prompt({
       message: 'Which AWS region?',
       initial: 'us-east-1',
-    })
+    })) as string
   }
 
   const route53domains = new Route53Domains({
@@ -34,7 +34,7 @@ const registerDomain = async (options: Options): Promise<DomainResult> => {
   const domainIsAlreadyOwned = domains.includes(domain)
   if (domainIsAlreadyOwned) {
     log.info('Domain is already owned. Proceeding.')
-    return { domain }
+    return { domain, region }
   }
 
   const {
@@ -139,7 +139,7 @@ const registerDomain = async (options: Options): Promise<DomainResult> => {
   spinner.stop()
   log.log('Domain registration complete!')
 
-  return { domain }
+  return { region, domain }
 }
 
 export default registerDomain

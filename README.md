@@ -2,9 +2,10 @@
 
 Automate the tedious process of domain registration, certificate setup, and GitHub secrets config.
 
-### Installation
+### Installing & Running
 
     npm install -g setup-domain-aws
+    setup-domain-aws [command] [options]
 
 or
 
@@ -47,9 +48,23 @@ Also, if you run `setup-domain-aws full` and you've already completed some of th
 
 The examples above use command-line options to supply information. If you don't do that (for example, if you just run `setup-domain-aws full`), the CLI will prompt you for each piece of information it needs.
 
-Note: it is not possible, for security reasons, to pass the GitHub PAT as a command-line option. You will be prompted for this information.
+Note: it is not possible, for security reasons, to pass the GitHub PAT as a command-line parameter. You will be prompted for this information.
+
+
+### CI/CD considerations
+
+When running `full` or `upload-config`, you can pass the option --get-pat-from-stdin and pipe it:
+
+    # GitHub Actions example:
+    echo ${{ secrets.PAT }} | setup-domain-aws upload-config --get-pat-from-stdin
+
+    # Mac OS Keychain example:
+    security find-generic-password -a ${USER} -s <keychain item name> -w | setup-domain-aws upload-config --get-pat-from-stdin
 
 
 ### TODOs
 
  - Allow subdomains to be passed to `setup-domain-aws full`, and parse the root domain for the `domain` step
+ - Add support for other secret store solutions for `upload-config`
+   - AWS Secrets Manager
+   - AWS Systems Manager Parameter Store
