@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { Command } from 'commander'
 import log from './helpers/logger'
 import { setCredentials } from './helpers/credentials'
