@@ -9,8 +9,16 @@ import Route53 from 'aws-sdk/clients/route53'
 const registerDomain = async (options: Options): Promise<DomainResult> => {
   log.log('Requesting TLS certificate from ACM')
 
-  const route53 = new Route53({ apiVersion: '2013-04-01' })
-  const route53domains = new Route53Domains({ apiVersion: '2014-05-15' })
+  const region = await prompt({
+    message: 'Which AWS region?',
+    initial: 'us-east-1',
+  })
+
+  const route53 = new Route53({ apiVersion: '2013-04-01', region })
+  const route53domains = new Route53Domains({
+    apiVersion: '2014-05-15',
+    region,
+  })
 
   let { domain } = options
 
@@ -36,6 +44,9 @@ const registerDomain = async (options: Options): Promise<DomainResult> => {
 
   let shouldUseExistingContactDetails = false
   if (existingContactDetail) {
+    log.debug('Existing contact details:')
+    log.debug(existingContactDetail)
+
     shouldUseExistingContactDetails = await prompt({
       type: 'confirm',
       message: 'Existing contact details detected. Use those?',
@@ -61,9 +72,24 @@ const registerDomain = async (options: Options): Promise<DomainResult> => {
     })
     contactDetails.ZipCode = await prompt({ message: 'Zipcode' })
     contactDetails.Email = await prompt({ message: 'Email' })
+    contactDetails.PhoneNumber = await prompt({
+      message: 'Phone number (must be in the form +1.1234567890)',
+    })
+    contactDetails.ContactType = 'PERSON'
 
     log.log("Great! We'll save those for next time.\n")
     storeContactDetails(contactDetails)
+  }
+
+  log.log(
+    '\nWarning! Proceeding will cause charges to your AWS account. See https://d32ze2gidvkk54.cloudfront.net/Amazon_Route_53_Domain_Registration_Pricing_20140731.pdf for Domain Registration pricing by TLD.',
+  )
+  const shouldProceed = await prompt({
+    type: 'confirm',
+    message: 'Proceed?',
+  })
+  if (!shouldProceed) {
+    process.exit()
   }
 
   const domainRequestOptions = {
@@ -81,8 +107,10 @@ const registerDomain = async (options: Options): Promise<DomainResult> => {
     .registerDomain(domainRequestOptions)
     .promise()
 
+  log.info(`Route53 operationId: ${operationId}`)
+
   const spinner = startSpinner(
-    'Waiting for domain registration request to complete.',
+    'Waiting for domain registration request to complete. Note: this can take ~15 minutes.',
   )
 
   while (true) {

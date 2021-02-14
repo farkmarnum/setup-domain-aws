@@ -1,15 +1,13 @@
 import log from './helpers/logger'
-import startSpinner from './helpers/loader'
-import { sleep } from './helpers/util'
+// import startSpinner from './helpers/loader'
+// import { sleep } from './helpers/util'
 import { prompt, validateDomainOrSubdomain } from './helpers/prompt'
-import { getStoredContactDetails } from './helpers/storage'
-import Route53Domains from 'aws-sdk/clients/route53domains'
-import Route53 from 'aws-sdk/clients/route53'
+import ACM from 'aws-sdk/clients/acm'
 
 const requestCert = async (options: Options): Promise<CertResult> => {
   log.log('Requesting TLS certificate from ACM')
 
-  // const route53 = new Route53({ apiVersion: '2013-04-01' })
+  const acm = new ACM({ apiVersion: '2015-12-08' })
   let { domain } = options
 
   if (!domain) {
@@ -19,7 +17,20 @@ const requestCert = async (options: Options): Promise<CertResult> => {
     })) as string
   }
 
-  const certificateArn = 'TODO'
+  const { CertificateArn: certificateArn } = await acm
+    .requestCertificate({
+      DomainName: domain,
+      ValidationMethod: 'DNS',
+      SubjectAlternativeNames: [`*.${domain}`],
+      IdempotencyToken: domain,
+    })
+    .promise()
+
+  if (!certificateArn) {
+    log.error('Certificate request failed!')
+    process.exit(1)
+  }
+
   log.info(`Certificate created. Arn: ${certificateArn}`)
   return { certificateArn }
 }

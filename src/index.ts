@@ -1,8 +1,22 @@
 import { Command } from 'commander'
-import { init } from './helpers/commands'
+import log from './helpers/logger'
+import { setCredentials } from './helpers/credentials'
 import requestCert from './cert'
 import uploadConfig from './config'
 import registerDomain from './domain'
+
+export const init = async (
+  options: Options,
+  callback: (options: Options) => Promise<any>,
+): Promise<any> => {
+  if (options.verbose) log.setLogLevel('info')
+  if (options.extraVerbose) log.setLogLevel('debug')
+
+  const { profile } = options
+  setCredentials(profile)
+
+  return await callback(options)
+}
 
 const program = new Command()
 
@@ -21,6 +35,7 @@ program
   )
   .option('-v, --verbose', 'Verbose mode')
   .option('-vv, --extra-verbose', 'Debug mode')
+  .option('--dry-run', 'Dry run')
   .option(
     '-p, --profile <profile name>',
     "AWS profile to use (if unspecified, uses 'default'",
@@ -32,6 +47,7 @@ program
   .description('Register domain in Route53')
   .option('-v, --verbose', 'Verbose mode')
   .option('-vv, --extra-verbose', 'Debug mode')
+  .option('--dry-run', 'Dry run')
   .option(
     '-p, --profile <profile name>',
     "AWS profile to use (if unspecified, uses 'default'",
@@ -43,6 +59,7 @@ program
   .description('Request certificate in ACM & validate via Route53 DNS')
   .option('-v, --verbose', 'Verbose mode')
   .option('-vv, --extra-verbose', 'Debug mode')
+  .option('--dry-run', 'Dry run')
   .option(
     '-p, --profile <profile name>',
     "AWS profile to use (if unspecified, uses 'default'",
@@ -56,6 +73,7 @@ program
   )
   .option('-v, --verbose', 'Verbose mode')
   .option('-vv, --extra-verbose', 'Debug mode')
+  .option('--dry-run', 'Dry run')
   .action((options) => init(options, uploadConfig))
 
 program.parse()
