@@ -6,6 +6,8 @@ import uploadConfig from './config'
 import registerDomain from './domain'
 import getHostedZoneId from './hosted-zone'
 
+const VERSION = '0.1.1'
+
 export const init = async (
   options: Options,
   callback: (options: Options) => Promise<any>,
@@ -29,7 +31,7 @@ const full = async (options: Options) => {
 }
 
 program
-  .version('0.0.1')
+  .version(VERSION)
   .description(
     'Use `setup-domain-aws full` to setup all resources, or other commands to set up one at a time. For example:\n' +
       '  setup-domain-aws full --domain website.tld --region us-east-1 --repo username/repo_name',
