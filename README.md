@@ -2,6 +2,8 @@
 
 Automate the tedious process of domain registration, certificate setup, and GitHub secrets config.
 
+![](demo.gif) 
+
 ### Installing & Running
 
     npm install -g setup-domain-aws
