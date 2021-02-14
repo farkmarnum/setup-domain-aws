@@ -8,7 +8,7 @@ import uploadConfig from './config'
 import registerDomain from './domain'
 import getHostedZoneId from './hosted-zone'
 
-const VERSION = '0.1.2'
+const VERSION = '0.1.3'
 
 export const init = async (
   options: Options,
