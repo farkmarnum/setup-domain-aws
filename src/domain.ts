@@ -4,29 +4,37 @@ import { sleep } from './helpers/util'
 import { prompt, validateDomainOrSubdomain } from './helpers/prompt'
 import { getStoredContactDetails, storeContactDetails } from './helpers/storage'
 import Route53Domains from 'aws-sdk/clients/route53domains'
-import Route53 from 'aws-sdk/clients/route53'
 
 const registerDomain = async (options: Options): Promise<DomainResult> => {
-  log.log('Requesting TLS certificate from ACM')
+  log.debug('registerDomain')
 
-  const region = await prompt({
-    message: 'Which AWS region?',
-    initial: 'us-east-1',
-  })
+  let { region, domain } = options
 
-  const route53 = new Route53({ apiVersion: '2013-04-01', region })
+  if (!region) {
+    region = await prompt({
+      message: 'Which AWS region?',
+      initial: 'us-east-1',
+    })
+  }
+
   const route53domains = new Route53Domains({
     apiVersion: '2014-05-15',
     region,
   })
 
-  let { domain } = options
-
   if (!domain) {
     domain = (await prompt({
-      message: 'What domain would you like to register?',
+      message: 'Domain',
       validate: validateDomainOrSubdomain,
     })) as string
+  }
+
+  const { Domains } = await route53domains.listDomains().promise()
+  const domains = Domains.map(({ DomainName }) => DomainName)
+  const domainIsAlreadyOwned = domains.includes(domain)
+  if (domainIsAlreadyOwned) {
+    log.info('Domain is already owned. Proceeding.')
+    return { domain }
   }
 
   const {
@@ -125,24 +133,13 @@ const registerDomain = async (options: Options): Promise<DomainResult> => {
       process.exit(1)
     }
 
-    sleep(10 * 1000)
+    await sleep(10 * 1000)
   }
 
   spinner.stop()
   log.log('Domain registration complete!')
 
-  const hostedZones = await route53.listHostedZones().promise()
-  const hostedZone = hostedZones.HostedZones.find(
-    ({ Name: name }) => name === domain,
-  )
-  if (!hostedZone) {
-    log.error('Unable to retrieve hosted zone for newly registered domain.')
-    process.exit(1)
-  }
-  const hostedZoneId = hostedZone.Id
-  log.info(`Domain registered. Hosted zone id: ${hostedZoneId}`)
-
-  return { domain, hostedZoneId }
+  return { domain }
 }
 
 export default registerDomain

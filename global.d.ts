@@ -5,15 +5,20 @@ type Options = {
   hostedZoneId?: string
   certificateArn?: string
   profile?: string
+  region?: string
+  repo?: string
 }
 
 interface DomainResult {
   domain: string
-  hostedZoneId: string
 }
 
 interface CertResult {
   certificateArn: string
+}
+
+interface HostedZoneResult {
+  hostedZoneId: string
 }
 
 interface PromptArgs {
