@@ -9,7 +9,7 @@ import registerDomain from './domain'
 import getHostedZoneId from './hosted-zone'
 import { loadPipedData } from './helpers/stdin'
 
-const VERSION = '0.1.3'
+const VERSION = '0.2.0'
 
 export const init = async (
   options: Options,
