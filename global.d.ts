@@ -12,7 +12,7 @@ type Options = {
   certificateArn?: string
   profile?: string
   region?: string
-  repo?: string
+  storeConfigTarget?: string
   getPatFromStdin?: boolean
 }
 
@@ -34,4 +34,5 @@ interface PromptArgs {
   type?: import('prompts').PromptType
   validate?: (arg0: string) => boolean | string
   initial?: any
+  choices?: Record<string, any>[]
 }

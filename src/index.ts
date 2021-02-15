@@ -4,7 +4,7 @@ import { Command } from 'commander'
 import log from './helpers/logger'
 import { setCredentials } from './helpers/credentials'
 import requestCert from './cert'
-import uploadConfig from './config'
+import storeConfig from './store-config'
 import registerDomain from './domain'
 import getHostedZoneId from './hosted-zone'
 import { loadPipedData } from './helpers/stdin'
@@ -37,7 +37,7 @@ const full = async (options: Options) => {
   const { domain, region } = await registerDomain(options)
   const { hostedZoneId } = await getHostedZoneId({ ...options, domain, region })
   const { certificateArn } = await requestCert({ ...options, domain, region })
-  await uploadConfig({
+  await storeConfig({
     ...options,
     domain,
     hostedZoneId,
@@ -49,8 +49,7 @@ const full = async (options: Options) => {
 program
   .version(VERSION)
   .description(
-    'Use `setup-domain-aws full` to setup all resources, or other commands to set up one at a time. For example:\n' +
-      '  setup-domain-aws full --domain website.tld --region us-east-1 --repo username/repo_name',
+    'Use `setup-domain-aws full` to setup all resources, or other commands to set up one at a time',
   )
 
 program
@@ -66,8 +65,11 @@ program
   )
   .option('--domain <domain>', 'Domain')
   .option('--region <region>', 'AWS region')
-  .option('--repo <repo>', 'GitHub repository')
   .option('--get-pat-from-stdin', 'Get GitHub Personal Access Token from stdin')
+  .option(
+    '--store-config-target <target>',
+    'Where to store the generated config: github://<owner/repo> | file://<file_path> | secretsmanager://<prefix> | ssm://<prefix>',
+  )
   .action((options) => init(options, full))
 
 program
@@ -75,6 +77,7 @@ program
   .description('Register domain in Route53')
   .option('-v, --verbose', 'Verbose mode')
   .option('-vv, --extra-verbose', 'Debug mode')
+  .option('--domain <domain>', 'Domain')
   .option('--region <region>', 'AWS region')
   .option(
     '--profile <profile name>',
@@ -109,14 +112,18 @@ program
   .action((options) => init(options, requestCert))
 
 program
-  .command('upload-config')
+  .command('store-config')
   .description(
     'upload HOSTED_ZONE_ID, CERTIFICATE_ARN, DOMAIN values to GitHub secrets',
   )
+  .usage('setup-domain-aws store-config ')
   .option('-v, --verbose', 'Verbose mode')
   .option('-vv, --extra-verbose', 'Debug mode')
-  .option('--repo <repo>', 'GitHub repository')
+  .option(
+    '--store-config-target <target-type> <target>',
+    'Where to store the generated config: github://<owner/repo> | file://<file_path> | secretsmanager://<prefix> | ssm://<prefix>',
+  )
   .option('--get-pat-from-stdin', 'Get GitHub Personal Access Token from stdin')
-  .action((options) => init(options, uploadConfig))
+  .action((options) => init(options, storeConfig))
 
 program.parse()

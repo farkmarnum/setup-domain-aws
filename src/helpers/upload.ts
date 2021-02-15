@@ -1,19 +1,20 @@
+import fs from 'fs'
 import sodium from 'tweetsodium'
 import { Octokit } from '@octokit/core'
 import log from './logger'
 
-interface UploadArgs {
+interface UploadToGitHubArgs {
   auth: string
   repo: string
   name: string
   value: string
 }
-export const upload = async ({
+export const uploadToGitHub = async ({
   auth,
   repo,
   name,
   value,
-}: UploadArgs): Promise<void> => {
+}: UploadToGitHubArgs): Promise<void> => {
   const octokit = new Octokit({ auth })
 
   const resp = await octokit.request(
@@ -46,4 +47,25 @@ export const upload = async ({
   }
 
   log.info(`Successfully set value for ${name}`)
+}
+
+interface WriteToFileArgs {
+  domain: string
+  hostedZoneId: string
+  certificateArn: string
+  path: string
+}
+export const writeToFile = ({
+  domain,
+  hostedZoneId,
+  certificateArn,
+  path,
+}: WriteToFileArgs) => {
+  const data = `
+DOMAIN=${domain}
+HOSTED_ZONE_ID=${hostedZoneId}
+CERTIFICATE_ARN=${certificateArn}
+`
+
+  fs.writeFileSync(path, data)
 }
