@@ -14,6 +14,7 @@ export const prompt = async ({
   message,
   type = 'text',
   initial,
+  choices,
   validate = () => true,
 }: PromptArgs): Promise<any> => {
   const { response } = await prompts(
@@ -23,12 +24,14 @@ export const prompt = async ({
       message,
       validate,
       initial,
+      choices,
       stdin,
     },
     {
       onCancel: () => {
         log.info('User interrupt! Exiting.')
         process.exit(1)
+        return true
       },
     },
   )

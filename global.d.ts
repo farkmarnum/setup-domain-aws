@@ -34,5 +34,5 @@ interface PromptArgs {
   type?: import('prompts').PromptType
   validate?: (arg0: string) => boolean | string
   initial?: any
-  choices?: Record<string, any>[]
+  choices?: import('prompts').Choice[] | undefined
 }

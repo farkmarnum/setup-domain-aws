@@ -110,45 +110,54 @@ const storeConfig = async (options: Options) => {
       process.exit(1)
     }
   } else {
-    targetType = (await prompt({
-      message: 'Where do you want to store the config?',
-      type: 'list',
-      choices: [
-        {
-          title: 'GitHub Secrets',
-          value: 'github',
-        },
-        {
-          title: 'AWS Secrets Manager',
-          value: 'secretsmanager',
-        },
-        {
-          title: 'AWS Systems Manager Parameter Store',
-          value: 'ssm',
-        },
-        {
-          title: 'File',
-          value: 'file',
-        },
-      ],
-    })) as string
+    try {
+      targetType = (await prompt({
+        message: 'Where do you want to store the config?',
+        type: 'select',
+        choices: [
+          {
+            title: 'GitHub Secrets',
+            value: 'github',
+          },
+          {
+            title: 'AWS Secrets Manager',
+            value: 'secretsmanager',
+          },
+          {
+            title: 'AWS Systems Manager Parameter Store',
+            value: 'ssm',
+          },
+          {
+            title: 'File',
+            value: 'file',
+          },
+        ],
+      })) as string
+    } catch (err) {
+      console.error(err)
+    }
+
     switch (targetType) {
       case 'github':
         targetValue = (await prompt({
           message: 'What is the GitHub repo (<user>/<repo>)?',
         })) as string
+        break
       case 'secretsmanager':
         targetValue = (await prompt({
           message: 'What prefix should we use for secretsmanager?',
         })) as string
+        break
       case 'ssm':
         targetValue = (await prompt({
           message: 'What prefix should we use for ssm?',
         })) as string
+        break
       case 'file':
         targetValue = (await prompt({
           message: 'What path should we use for the file?',
         })) as string
+        break
       default:
         log.error('Unknown target type')
         process.exit(1)
