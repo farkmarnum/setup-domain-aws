@@ -92,5 +92,3 @@ Note: when using GitHub Secrets as a the store-config target, it is not possible
  - Finish:
    - AWS Secrets Manager
    - AWS Systems Manager Parameter Store
-   - Add demo mode
- - Allow subdomains to be passed to `setup-domain-aws full`, and parse the root domain for the `domain` step
