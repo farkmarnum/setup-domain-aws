@@ -94,7 +94,10 @@ const registerDomain = async (options: Options): Promise<DomainResult> => {
     contactDetails.ZipCode = await prompt({ message: 'Zipcode' })
     contactDetails.Email = await prompt({ message: 'Email' })
     contactDetails.PhoneNumber = await prompt({
-      message: 'Phone number (must be in the form +1.1234567890)',
+      message: 'Phone number (in the form +1.1234567890)',
+      validate: (value: string) =>
+        /^\+\d{1,5}\.\d{10}$/.test(value) ||
+        'Must be in the form +<country code>.<10-digit number>',
     })
     contactDetails.ContactType = 'PERSON'
 
