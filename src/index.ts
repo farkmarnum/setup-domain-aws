@@ -8,8 +8,7 @@ import storeConfig from './store-config'
 import registerDomain from './domain'
 import getHostedZoneId from './hosted-zone'
 import { loadPipedData } from './helpers/stdin'
-
-const VERSION = '0.2.0'
+import pkg from '../package.json'
 
 export const init = async (
   options: Options,
@@ -47,7 +46,7 @@ const full = async (options: Options) => {
 }
 
 program
-  .version(VERSION)
+  .version(pkg.version)
   .description(
     'Use `setup-domain-aws full` to setup all resources, or other commands to set up one at a time',
   )
