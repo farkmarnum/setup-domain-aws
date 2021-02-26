@@ -126,7 +126,7 @@ program
   .option('-v, --verbose', 'Verbose mode')
   .option('-vv, --extra-verbose', 'Debug mode')
   .option(
-    '--store-config-target <target-type> <target>',
+    '--store-config-target <target-type://target>',
     'Where to store the generated config: github://<owner/repo> | file://<file_path> | secretsmanager://<prefix> | ssm://<prefix>',
   )
   .option('--get-pat-from-stdin', 'Get GitHub Personal Access Token from stdin')
