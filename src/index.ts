@@ -50,6 +50,8 @@ const full = async (options: Options) => {
     certificateArn,
     region,
   })
+
+  log.log()
 }
 
 program

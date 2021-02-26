@@ -17,31 +17,31 @@ class Logger {
     this.logLevel = level
   }
 
-  debug(str: LogInput) {
+  debug(str: LogInput = '') {
     if (['debug'].includes(this.logLevel)) {
       console.debug(str)
     }
   }
 
-  info(str: LogInput) {
+  info(str: LogInput = '') {
     if (['debug', 'info'].includes(this.logLevel)) {
       console.info(str)
     }
   }
 
-  log(str: LogInput) {
+  log(str: LogInput = '') {
     if (['debug', 'info', 'log'].includes(this.logLevel)) {
       console.log(str)
     }
   }
 
-  warn(str: LogInput) {
+  warn(str: LogInput = '') {
     if (['debug', 'info', 'log', 'warn'].includes(this.logLevel)) {
       console.warn(str)
     }
   }
 
-  error(str: LogInput) {
+  error(str: LogInput = '') {
     if (['debug', 'info', 'log', 'warn', 'error'].includes(this.logLevel)) {
       console.error(str)
     }

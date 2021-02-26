@@ -4,6 +4,7 @@ import { sleep } from './helpers/util'
 import { prompt } from './helpers/prompt'
 import { validateDomain, getDomainInfo } from './helpers/domain'
 import { getStoredContactDetails, storeContactDetails } from './helpers/storage'
+import { BOLD, RED, YELLOW, NOFORMAT } from './helpers/colors'
 import Route53Domains from 'aws-sdk/clients/route53domains'
 
 const registerDomain = async (options: Options): Promise<DomainResult> => {
@@ -106,7 +107,10 @@ const registerDomain = async (options: Options): Promise<DomainResult> => {
   }
 
   log.log(
-    '\nWarning! Proceeding will cause charges to your AWS account. See https://d32ze2gidvkk54.cloudfront.net/Amazon_Route_53_Domain_Registration_Pricing_20140731.pdf for Domain Registration pricing by TLD.',
+    `
+${RED}${BOLD}Warning!${NOFORMAT} Proceeding will cause charges to your AWS account.
+See ${YELLOW}https://d32ze2gidvkk54.cloudfront.net/Amazon_Route_53_Domain_Registration_Pricing_20140731.pdf${NOFORMAT} for Domain Registration pricing by TLD.
+`,
   )
   const shouldProceed = await prompt({
     type: 'confirm',
