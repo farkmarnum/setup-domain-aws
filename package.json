@@ -9,7 +9,9 @@
   ],
   "description": "Automate AWS to buy a domain, set up Route53, & set up ACM cert.",
   "main": "lib/src/index.js",
-  "bin": "lib/src/index.js",
+  "bin": {
+    "setup-domain-aws": "lib/src/index.js"
+  },
   "types": "lib/index.d.ts",
   "version": "0.2.1",
   "scripts": {
