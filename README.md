@@ -86,3 +86,7 @@ Note: when using GitHub Secrets as a the store-config target, it is not possible
 
     # Mac OS Keychain example:
     security find-generic-password -a ${USER} -s <keychain item name> -w | setup-domain-aws store-config --get-pat-from-stdin
+&nbsp;
+## TODOs
+
+ - Tests...
