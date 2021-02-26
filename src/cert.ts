@@ -12,8 +12,6 @@ const hash = (data: string) =>
   createHash('sha1').update(data).digest('base64').replace(/[^\w]/g, '')
 
 const requestCert = async (options: Options): Promise<CertResult> => {
-  log.debug('requestCert')
-
   let { domain, region } = options
 
   if (!domain) {

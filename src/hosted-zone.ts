@@ -1,16 +1,16 @@
 import log from './helpers/logger'
 import { prompt } from './helpers/prompt'
+import { getDomainInfo } from './helpers/domain'
 import Route53 from 'aws-sdk/clients/route53'
 
 const getHostedZoneId = async (options: Options): Promise<HostedZoneResult> => {
-  log.debug('getHostedZoneId')
-
+  const { isDemo } = options
   let { region, domain } = options
 
   if (!domain) {
-    domain = await prompt({
+    domain = (await prompt({
       message: 'Which domain?',
-    })
+    })) as string
   }
 
   if (!region) {
@@ -20,7 +20,16 @@ const getHostedZoneId = async (options: Options): Promise<HostedZoneResult> => {
     })
   }
 
+  const { isSubdomain, tld, sld } = getDomainInfo(domain)
+  if (isSubdomain) {
+    domain = `${sld}.${tld}`
+  }
+
   const route53 = new Route53({ apiVersion: '2013-04-01', region })
+
+  if (isDemo) {
+    return { hostedZoneId: 'placeholder' }
+  }
 
   const hostedZones = await route53.listHostedZones().promise()
 

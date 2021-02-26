@@ -17,6 +17,13 @@ export const init = async (
   if (options.verbose) log.setLogLevel('info')
   if (options.extraVerbose) log.setLogLevel('debug')
 
+  options.isDemo =
+    process.env.SETUP_DOMAIN_AWS_DEMO_MODE_DO_NOT_USE_THIS_IN_PROD === 'true'
+
+  if (options.isDemo) {
+    log.debug('STARTING IN DEMO MODE.')
+  }
+
   const { profile } = options
   setCredentials(profile)
 

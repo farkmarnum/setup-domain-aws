@@ -14,6 +14,7 @@ type Options = {
   region?: string
   storeConfigTarget?: string
   getPatFromStdin?: boolean
+  isDemo?: boolean
 }
 
 interface DomainResult {

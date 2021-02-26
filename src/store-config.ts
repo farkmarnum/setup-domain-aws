@@ -73,8 +73,6 @@ const handleFile = ({
 }
 
 const storeConfig = async (options: Options) => {
-  log.debug('uploadConfig')
-
   const { storeConfigTarget, getPatFromStdin } = options
   let { domain, hostedZoneId, certificateArn } = options
   if (!domain) {

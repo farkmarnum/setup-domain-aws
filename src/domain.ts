@@ -7,8 +7,7 @@ import { getStoredContactDetails, storeContactDetails } from './helpers/storage'
 import Route53Domains from 'aws-sdk/clients/route53domains'
 
 const registerDomain = async (options: Options): Promise<DomainResult> => {
-  log.debug('registerDomain')
-
+  const { isDemo } = options
   let { region, domain } = options
 
   if (!region) {
@@ -30,23 +29,36 @@ const registerDomain = async (options: Options): Promise<DomainResult> => {
     })) as string
   }
 
-  const { Domains } = await route53domains.listDomains().promise()
-  const domains = Domains.map(({ DomainName }) => DomainName)
-  const domainIsAlreadyOwned = domains.includes(domain)
-  if (domainIsAlreadyOwned) {
-    log.info('Domain is already owned. Proceeding.')
-    return { domain, region }
+  let rootDomain = domain
+  const { isSubdomain, tld, sld } = getDomainInfo(domain)
+  if (isSubdomain) {
+    rootDomain = `${sld}.${tld}`
+    log.info(
+      `Note: ${domain} is a subdomain, so ${rootDomain} is the domain that will be registered.`,
+    )
   }
 
-  const {
-    Availability: availability,
-  } = await route53domains
-    .checkDomainAvailability({ DomainName: domain })
-    .promise()
+  if (!isDemo) {
+    const { Domains } = await route53domains.listDomains().promise()
+    const domains = Domains.map(({ DomainName }) => DomainName)
+    const domainIsAlreadyOwned = domains.includes(rootDomain)
+    if (domainIsAlreadyOwned) {
+      log.info('Domain is already owned. Proceeding.')
+      return { domain, region }
+    }
 
-  if (availability !== 'AVAILABLE') {
-    log.error(`Domain ${domain} is not available! Status = ${availability}`)
-    process.exit(1)
+    const {
+      Availability: availability,
+    } = await route53domains
+      .checkDomainAvailability({ DomainName: rootDomain })
+      .promise()
+
+    if (availability !== 'AVAILABLE') {
+      log.error(
+        `Domain ${rootDomain} is not available! Status = ${availability}`,
+      )
+      process.exit(1)
+    }
   }
 
   const existingContactDetail = getStoredContactDetails()
@@ -101,40 +113,49 @@ const registerDomain = async (options: Options): Promise<DomainResult> => {
     process.exit()
   }
 
-  const domainRequestOptions = {
-    DomainName: domain,
-    DurationInYears: 1,
-    AutoRenew: true,
-    AdminContact: contactDetails,
-    RegistrantContact: contactDetails,
-    TechContact: contactDetails,
-    PrivacyProtectAdminContact: true,
-    PrivacyProtectRegistrantContact: true,
-    PrivacyProtectTechContact: true,
-  }
-  const { OperationId: operationId } = await route53domains
-    .registerDomain(domainRequestOptions)
-    .promise()
+  let operationId = ''
 
-  log.info(`Route53 operationId: ${operationId}`)
+  if (!isDemo) {
+    const domainRequestOptions = {
+      DomainName: rootDomain,
+      DurationInYears: 1,
+      AutoRenew: true,
+      AdminContact: contactDetails,
+      RegistrantContact: contactDetails,
+      TechContact: contactDetails,
+      PrivacyProtectAdminContact: true,
+      PrivacyProtectRegistrantContact: true,
+      PrivacyProtectTechContact: true,
+    }
+    const { OperationId } = await route53domains
+      .registerDomain(domainRequestOptions)
+      .promise()
+
+    operationId = OperationId
+    log.debug(`Route53 operationId: ${operationId}`)
+  }
 
   const spinner = startSpinner(
     'Waiting for domain registration request to complete. Note: this can take ~15 minutes.',
   )
 
-  while (true) {
-    const { Status: status } = await route53domains
-      .getOperationDetail({ OperationId: operationId })
-      .promise()
+  if (isDemo) {
+    await sleep(5 * 1000)
+  } else {
+    while (true) {
+      const { Status: status } = await route53domains
+        .getOperationDetail({ OperationId: operationId })
+        .promise()
 
-    if (status === 'SUCCESSFUL') {
-      break
-    } else if (status === 'ERROR' || status === 'FAILED') {
-      log.error(`Domain registration did not succeed. Status: ${status}.`)
-      process.exit(1)
+      if (status === 'SUCCESSFUL') {
+        break
+      } else if (status === 'ERROR' || status === 'FAILED') {
+        log.error(`Domain registration did not succeed. Status: ${status}.`)
+        process.exit(1)
+      }
+
+      await sleep(10 * 1000)
     }
-
-    await sleep(10 * 1000)
   }
 
   spinner.stop()
