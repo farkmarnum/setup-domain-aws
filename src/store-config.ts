@@ -8,6 +8,7 @@ interface StoreConfigHandlerParams {
   certificateArn: string
   targetValue: string
   getPatFromStdin?: boolean
+  isDemo?: boolean
 }
 
 const handleGithubSecrets = async ({
@@ -16,6 +17,7 @@ const handleGithubSecrets = async ({
   certificateArn,
   targetValue,
   getPatFromStdin,
+  isDemo,
 }: StoreConfigHandlerParams): Promise<void> => {
   let auth
   if (getPatFromStdin) {
@@ -23,24 +25,27 @@ const handleGithubSecrets = async ({
   } else {
     auth = await prompt({
       message: 'GitHub personal access token',
+      type: 'password',
     })
   }
 
   const repo = targetValue
 
-  await uploadToGitHub({ auth, repo, name: 'DOMAIN', value: domain })
-  await uploadToGitHub({
-    auth,
-    repo,
-    name: 'HOSTED_ZONE_ID',
-    value: hostedZoneId,
-  })
-  await uploadToGitHub({
-    auth,
-    repo,
-    name: 'CERTIFICATE_ARN',
-    value: certificateArn,
-  })
+  if (!isDemo) {
+    await uploadToGitHub({ auth, repo, name: 'DOMAIN', value: domain })
+    await uploadToGitHub({
+      auth,
+      repo,
+      name: 'HOSTED_ZONE_ID',
+      value: hostedZoneId,
+    })
+    await uploadToGitHub({
+      auth,
+      repo,
+      name: 'CERTIFICATE_ARN',
+      value: certificateArn,
+    })
+  }
 
   log.log('Setting GitHub Secrets complete!')
 }
@@ -50,8 +55,12 @@ const handleSecretsmanager = async ({
   hostedZoneId,
   certificateArn,
   targetValue,
+  isDemo,
 }: StoreConfigHandlerParams): Promise<void> => {
-  log.error('TODO!')
+  if (!isDemo) {
+    // TODO
+  }
+  log.log('Setting AWS Secrets Manager secrets complete!')
 }
 
 const handleSsm = async ({
@@ -59,8 +68,12 @@ const handleSsm = async ({
   hostedZoneId,
   certificateArn,
   targetValue,
+  isDemo,
 }: StoreConfigHandlerParams): Promise<void> => {
-  log.error('TODO!')
+  if (!isDemo) {
+    // TODO
+  }
+  log.log('Setting SSM parameters complete!')
 }
 
 const handleFile = ({
@@ -68,13 +81,18 @@ const handleFile = ({
   hostedZoneId,
   certificateArn,
   targetValue,
+  isDemo,
 }: StoreConfigHandlerParams): void => {
-  writeToFile({ domain, hostedZoneId, certificateArn, path: targetValue })
+  if (!isDemo) {
+    writeToFile({ domain, hostedZoneId, certificateArn, path: targetValue })
+  }
+  log.log('Writing secrets to file complete!')
 }
 
 const storeConfig = async (options: Options) => {
-  const { storeConfigTarget, getPatFromStdin } = options
+  const { storeConfigTarget, getPatFromStdin, isDemo } = options
   let { domain, hostedZoneId, certificateArn } = options
+
   if (!domain) {
     domain = (await prompt({
       message: 'What is the value of DOMAIN?',
@@ -131,7 +149,7 @@ const storeConfig = async (options: Options) => {
         ],
       })) as string
     } catch (err) {
-      console.error(err)
+      log.error(err)
     }
 
     switch (targetType) {
@@ -166,6 +184,7 @@ const storeConfig = async (options: Options) => {
     hostedZoneId,
     certificateArn,
     targetValue,
+    isDemo,
   }
 
   switch (targetType) {

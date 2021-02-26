@@ -143,7 +143,7 @@ const registerDomain = async (options: Options): Promise<DomainResult> => {
   )
 
   if (isDemo) {
-    await sleep(5 * 1000)
+    await sleep(2.5 * 1000)
   } else {
     while (true) {
       const { Status: status } = await route53domains

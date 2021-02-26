@@ -5,6 +5,7 @@ import Route53 from 'aws-sdk/clients/route53'
 
 const getHostedZoneId = async (options: Options): Promise<HostedZoneResult> => {
   const { isDemo } = options
+
   let { region, domain } = options
 
   if (!domain) {
