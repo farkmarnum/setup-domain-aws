@@ -1,5 +1,5 @@
 import log from './helpers/logger'
-import { prompt, validateDomainOrSubdomain } from './helpers/prompt'
+import { prompt } from './helpers/prompt'
 import Route53 from 'aws-sdk/clients/route53'
 
 const getHostedZoneId = async (options: Options): Promise<HostedZoneResult> => {

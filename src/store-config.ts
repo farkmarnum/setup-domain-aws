@@ -1,5 +1,5 @@
 import log from './helpers/logger'
-import { prompt, validateDomainOrSubdomain } from './helpers/prompt'
+import { prompt } from './helpers/prompt'
 import { uploadToGitHub, writeToFile } from './helpers/upload'
 
 interface StoreConfigHandlerParams {
@@ -80,7 +80,6 @@ const storeConfig = async (options: Options) => {
   if (!domain) {
     domain = (await prompt({
       message: 'What is the value of DOMAIN?',
-      validate: validateDomainOrSubdomain,
     })) as string
   }
   if (!hostedZoneId) {

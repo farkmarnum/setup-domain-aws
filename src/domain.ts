@@ -1,7 +1,8 @@
 import log from './helpers/logger'
 import startSpinner from './helpers/loader'
 import { sleep } from './helpers/util'
-import { prompt, validateDomainOrSubdomain } from './helpers/prompt'
+import { prompt } from './helpers/prompt'
+import { validateDomain, getDomainInfo } from './helpers/domain'
 import { getStoredContactDetails, storeContactDetails } from './helpers/storage'
 import Route53Domains from 'aws-sdk/clients/route53domains'
 
@@ -25,7 +26,7 @@ const registerDomain = async (options: Options): Promise<DomainResult> => {
   if (!domain) {
     domain = (await prompt({
       message: 'Domain',
-      validate: validateDomainOrSubdomain,
+      validate: validateDomain,
     })) as string
   }
 

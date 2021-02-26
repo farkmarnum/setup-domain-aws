@@ -1,7 +1,8 @@
 import log from './helpers/logger'
 import startSpinner from './helpers/loader'
 import { sleep } from './helpers/util'
-import { prompt, validateDomainOrSubdomain } from './helpers/prompt'
+import { prompt } from './helpers/prompt'
+import { validateDomain } from './helpers/domain'
 import ACM from 'aws-sdk/clients/acm'
 import Route53 from 'aws-sdk/clients/route53'
 import { createHash } from 'crypto'
@@ -18,7 +19,7 @@ const requestCert = async (options: Options): Promise<CertResult> => {
   if (!domain) {
     domain = (await prompt({
       message: 'What domain do you need a certificate for?',
-      validate: validateDomainOrSubdomain,
+      validate: validateDomain,
     })) as string
   }
 
