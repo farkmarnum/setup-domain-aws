@@ -18,10 +18,7 @@ const registerDomain = async (options: Options): Promise<DomainResult> => {
     })) as string
   }
 
-  const route53domains = new Route53Domains({
-    apiVersion: '2014-05-15',
-    region,
-  })
+  const route53domains = new Route53Domains({ region })
 
   if (!domain) {
     domain = (await prompt({

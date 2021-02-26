@@ -37,3 +37,13 @@ interface PromptArgs {
   initial?: any
   choices?: import('prompts').Choice[] | undefined
 }
+
+interface StoreConfigHandlerParams {
+  domain: string
+  region: string
+  hostedZoneId: string
+  certificateArn: string
+  targetValue: string
+  getPatFromStdin?: boolean
+  isDemo?: boolean
+}

@@ -1,7 +1,7 @@
-import fs from 'fs'
 import sodium from 'tweetsodium'
 import { Octokit } from '@octokit/core'
-import log from './logger'
+import log from '../logger'
+import { prompt } from '../prompt'
 
 interface UploadToGitHubArgs {
   auth: string
@@ -49,23 +49,43 @@ export const uploadToGitHub = async ({
   log.info(`Successfully set value for ${name}`)
 }
 
-interface WriteToFileArgs {
-  domain: string
-  hostedZoneId: string
-  certificateArn: string
-  path: string
-}
-export const writeToFile = ({
+const handleGithubSecrets = async ({
   domain,
   hostedZoneId,
   certificateArn,
-  path,
-}: WriteToFileArgs) => {
-  const data = `
-DOMAIN=${domain}
-HOSTED_ZONE_ID=${hostedZoneId}
-CERTIFICATE_ARN=${certificateArn}
-`
+  targetValue,
+  getPatFromStdin,
+  isDemo,
+}: StoreConfigHandlerParams): Promise<void> => {
+  let auth
+  if (getPatFromStdin) {
+    auth = global.pipedInput?.trim()
+  } else {
+    auth = await prompt({
+      message: 'GitHub personal access token',
+      type: 'password',
+    })
+  }
 
-  fs.writeFileSync(path, data)
+  const repo = targetValue
+
+  if (!isDemo) {
+    await uploadToGitHub({ auth, repo, name: 'DOMAIN', value: domain })
+    await uploadToGitHub({
+      auth,
+      repo,
+      name: 'HOSTED_ZONE_ID',
+      value: hostedZoneId,
+    })
+    await uploadToGitHub({
+      auth,
+      repo,
+      name: 'CERTIFICATE_ARN',
+      value: certificateArn,
+    })
+  }
+
+  log.log('Setting GitHub Secrets complete!')
 }
+
+export default handleGithubSecrets

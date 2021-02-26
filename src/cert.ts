@@ -31,8 +31,8 @@ const requestCert = async (options: Options): Promise<CertResult> => {
 
   const { hostedZoneId } = await getHostedZoneId({ domain, region, isDemo })
 
-  const route53 = new Route53({ apiVersion: '2013-04-01', region })
-  const acm = new ACM({ apiVersion: '2015-12-08', region })
+  const route53 = new Route53({ region })
+  const acm = new ACM({ region })
 
   if (!isDemo) {
     const { CertificateSummaryList } = await acm.listCertificates().promise()

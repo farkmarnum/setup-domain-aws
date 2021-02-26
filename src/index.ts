@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { Command } from 'commander'
+import AWS from 'aws-sdk'
 import log from './helpers/logger'
 import { setCredentials } from './helpers/credentials'
 import requestCert from './cert'
@@ -9,6 +10,14 @@ import registerDomain from './domain'
 import getHostedZoneId from './hosted-zone'
 import { loadPipedData } from './helpers/stdin'
 import pkg from '../package.json'
+
+AWS.config.apiVersions = {
+  route53domains: '2014-05-15',
+  route53: '2013-04-01',
+  acm: '2015-12-08',
+  ssm: '2014-11-06',
+  secretsmanager: '2017-10-17',
+}
 
 export const init = async (
   options: Options,

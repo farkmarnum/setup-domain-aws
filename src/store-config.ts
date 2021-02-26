@@ -1,97 +1,21 @@
+import Ssm from 'aws-sdk/clients/ssm'
 import log from './helpers/logger'
 import { prompt } from './helpers/prompt'
-import { uploadToGitHub, writeToFile } from './helpers/upload'
-
-interface StoreConfigHandlerParams {
-  domain: string
-  hostedZoneId: string
-  certificateArn: string
-  targetValue: string
-  getPatFromStdin?: boolean
-  isDemo?: boolean
-}
-
-const handleGithubSecrets = async ({
-  domain,
-  hostedZoneId,
-  certificateArn,
-  targetValue,
-  getPatFromStdin,
-  isDemo,
-}: StoreConfigHandlerParams): Promise<void> => {
-  let auth
-  if (getPatFromStdin) {
-    auth = global.pipedInput?.trim()
-  } else {
-    auth = await prompt({
-      message: 'GitHub personal access token',
-      type: 'password',
-    })
-  }
-
-  const repo = targetValue
-
-  if (!isDemo) {
-    await uploadToGitHub({ auth, repo, name: 'DOMAIN', value: domain })
-    await uploadToGitHub({
-      auth,
-      repo,
-      name: 'HOSTED_ZONE_ID',
-      value: hostedZoneId,
-    })
-    await uploadToGitHub({
-      auth,
-      repo,
-      name: 'CERTIFICATE_ARN',
-      value: certificateArn,
-    })
-  }
-
-  log.log('Setting GitHub Secrets complete!')
-}
-
-const handleSecretsmanager = async ({
-  domain,
-  hostedZoneId,
-  certificateArn,
-  targetValue,
-  isDemo,
-}: StoreConfigHandlerParams): Promise<void> => {
-  if (!isDemo) {
-    // TODO
-  }
-  log.log('Setting AWS Secrets Manager secrets complete!')
-}
-
-const handleSsm = async ({
-  domain,
-  hostedZoneId,
-  certificateArn,
-  targetValue,
-  isDemo,
-}: StoreConfigHandlerParams): Promise<void> => {
-  if (!isDemo) {
-    // TODO
-  }
-  log.log('Setting SSM parameters complete!')
-}
-
-const handleFile = ({
-  domain,
-  hostedZoneId,
-  certificateArn,
-  targetValue,
-  isDemo,
-}: StoreConfigHandlerParams): void => {
-  if (!isDemo) {
-    writeToFile({ domain, hostedZoneId, certificateArn, path: targetValue })
-  }
-  log.log('Writing secrets to file complete!')
-}
+import handleGithubSecrets from './helpers/upload-config/github'
+import handleSecretsmanager from './helpers/upload-config/secretsmanager'
+import handleSsm from './helpers/upload-config/ssm'
+import handleFile from './helpers/upload-config/file'
 
 const storeConfig = async (options: Options) => {
   const { storeConfigTarget, getPatFromStdin, isDemo } = options
-  let { domain, hostedZoneId, certificateArn } = options
+  let { region, domain, hostedZoneId, certificateArn } = options
+
+  if (!region) {
+    region = (await prompt({
+      message: 'Which AWS region?',
+      initial: 'us-east-1',
+    })) as string
+  }
 
   if (!domain) {
     domain = (await prompt({
@@ -185,6 +109,7 @@ const storeConfig = async (options: Options) => {
     certificateArn,
     targetValue,
     isDemo,
+    region,
   }
 
   switch (targetType) {

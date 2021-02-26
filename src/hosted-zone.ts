@@ -26,7 +26,7 @@ const getHostedZoneId = async (options: Options): Promise<HostedZoneResult> => {
     domain = `${sld}.${tld}`
   }
 
-  const route53 = new Route53({ apiVersion: '2013-04-01', region })
+  const route53 = new Route53({ region })
 
   if (isDemo) {
     return { hostedZoneId: 'placeholder' }
