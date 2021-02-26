@@ -74,7 +74,7 @@ You can run any of the steps individually!
   - Use **store-config** to store config info for CI/CD.
 
 Also, if you run `setup-domain-aws full` and you've already completed some of the steps (for example, if you already own the domain), the CLI will skip over those steps.
-
+&nbsp;
 ### Command-line options vs prompts
 
 The examples above use command-line options to supply information. If you don't do that (for example, if you just run `setup-domain-aws full`), the CLI will prompt you for each piece of information it needs.
@@ -86,11 +86,11 @@ Note: when using GitHub Secrets as a the store-config target, it is not possible
 
     # Mac OS Keychain example:
     security find-generic-password -a ${USER} -s <keychain item name> -w | setup-domain-aws store-config --get-pat-from-stdin
-
-
+&nbsp;
 ### TODOs
 
  - Finish:
    - AWS Secrets Manager
    - AWS Systems Manager Parameter Store
+   - Add demo mode
  - Allow subdomains to be passed to `setup-domain-aws full`, and parse the root domain for the `domain` step
